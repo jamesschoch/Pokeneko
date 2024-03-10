@@ -15,28 +15,207 @@
 
     <script src="https://james.nekoweb.org/index.js"></script>
 
-
     <style>
-        /* html,
+        html,
         body {
             padding: 0;
-            margin: 0
-        }
-
-        body {
-            background-color: #e0e0e0; 
-            font-family: sans-serif;
-            width: 100vw;
-            height: 100vh;
+            margin: 0;
+            background-color: #60c0f8;
+            height: 100%;
+            cursor:
+                image-set(url("https://james.nekoweb.org/gbacursor.png") 1x) 0 20,
+                auto;
+            font-size: 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        } */
+            image-rendering: pixelated;
+        }
+
+        @keyframes clouds {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 100% 0;
+            }
+        }
+
+        @keyframes blink {
+            to {
+                visibility: hidden;
+            }
+        }
+
+        .created,
+        .updated,
+        .visitors,
+        .followers {
+            font-style: normal;
+        }
+
+        .menuborder {
+            image-rendering: pixelated;
+            border-image-slice: 5 5 5 5;
+            border-image-width: 6px 6px 6px 6px;
+            border-image-repeat: stretch stretch;
+            border-image-source: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALYAAAAeCAYAAACBv+SHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFyWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuZjM1NGVmYywgMjAyMy8xMS8wOS0xMjo0MDoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjUgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNC0wMy0wNVQxMDozMTozMSsxMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjQtMDMtMDVUMTA6MzM6MzErMTM6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjQtMDMtMDVUMTA6MzM6MzErMTM6MDAiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjBiODE2OTY2LTRmNTQtNjk0Ny1hMWU4LWU2N2U2ZjkyZWQ3NiIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjYzYmRhM2UzLWY4ODEtMmU0Ni04NDUzLWY3OWViYjk1MzY3YyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjcyNTExZjJlLWM0NmMtZTI0NC1hYTkyLTllNjQzNzAwYjE0MSI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NzI1MTFmMmUtYzQ2Yy1lMjQ0LWFhOTItOWU2NDM3MDBiMTQxIiBzdEV2dDp3aGVuPSIyMDI0LTAzLTA1VDEwOjMxOjMxKzEzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjUuNSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjBiODE2OTY2LTRmNTQtNjk0Ny1hMWU4LWU2N2U2ZjkyZWQ3NiIgc3RFdnQ6d2hlbj0iMjAyNC0wMy0wNVQxMDozMzozMSsxMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI1LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PtzYb08AAAE8SURBVHic7dwhboRAGIbhj82KypFIJHWzDrmykiP0GD1Cj9EjICsrceB25cqRSNysaEuaQtKEEgh/3sfBIH7xZoKZSWKMejydogAjLk2TJLn3UZKezi9K02zjkYD5Qrjp/eNVkpTk3sfCP8s9dNtOBSyg653q9k0HSQrhuvU8wCK+Wz5OLRZlLp/6NecBZmlDq7oab8yjsIsyV3ku15gJ+LcszyRVo7gPvz9kp8beTDU7ChuwgLBhEmHDJMKGSYQNkwgbJhE2TCJsmETYMImwYRJhwyTChkmEDZMIGyYRNkwibJhE2DBpFHYb2g3GAOabanZ05vHz7FjFETHswp+HebveDXeL1NVVtbiSAfvS9U5SkPTjV8S59GsB2J+ud3IuHZ6PknQL9fAirD8TsICgEK5DywmXUsKaS9Mkd3kdU6ukEG8vAAAAAElFTkSuQmCC");
+            border-style: solid;
+            border-image-outset: 6px;
+            background-color: #f8f8f8;
+            max-width: 300px;
+            padding-right: 20px;
+            box-sizing: border-box;
+            margin: 8px;
+        }
+
+        .menuborderinner {
+            font-family: "Pokemon Emerald Pro";
+            color: #606060;
+            text-shadow: 1px 1px 0px rgba(208, 208, 200, 1);
+            display: inline-block;
+            /* min-width: 546px; */
+            box-sizing: border-box;
+            padding: 4px 6px 4px 4px;
+            font-size: 22px;
+            line-height: 20px;
+        }
+
+        .speechborder {
+            image-rendering: pixelated;
+            border-image-slice: 5 10 5 10;
+            border-image-width: 10px 20px 10px 20px;
+            border-image-outset: 0px 0px 0px 0px;
+            border-image-repeat: stretch stretch;
+            border-image-source: url("data:image/gif;base64,R0lGODlh7gAqAKIAAADIuAD4mODo4Pj4+P///wAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFAAAEACwAAAAA7gAqAAAD/0iq0f4wykmrvTjrzbv/3SISYGmeaKqurDQ6QAwEQm3feK7vfO//wKBwSCwaj7uAbNZYNJYAwWBKrVqv2Kx2y+16v+CweEwubwXQJkkpk5rf8Lh8Tq/L0bLms23v+/+AgYJ4MQ9LboKJiouMioRMezGIjZSVlpdcj4Z8mJ2en45Lm5Kgpaanb5ownKitrq9VqpFRsLW2pbJspLe8vY25h77Cw3/ArMTIyWXGu8rOz13MtNDU1bGiq83W287Sk9zgw97h5OLYs9/l6q/j6+7s57rT7/Sm7fX4nvf5/JX7/QBD5ck2L6DBQP8OKqyTcKFDOA0fShwTcaJFLxUvasyScUKjRyodP3oMKVIjyZIWT6KUqGpNsJUoW7p8CXNkmgBOZtFAwrOnz59AgwpFIs/BixZIkypdyrTpiJxNo0qdStWpiAQAOw==");
+            border-style: solid;
+            border-image-outset: 6px;
+            background-color: #f8f8f8;
+            max-width: 300px;
+            padding-right: 10px;
+            box-sizing: border-box;
+            margin: 8px;
+            min-height: 56px;
+        }
+
+        .speechborderinner {
+            font-family: "Pokemon Emerald Pro";
+            color: #606060;
+            text-shadow: 1px 1px 0px rgba(208, 208, 200, 1);
+            display: inline-block;
+            /* min-width: 546px; */
+            box-sizing: border-box;
+            line-height: 18px;
+            font-size: 22px;
+            padding: 4px 6px 4px 16px;
+        }
+
+        .speechborderinner:after {
+            background-image: url("data:image/gif;base64,R0lGODlhBwAHAJEAAOAICGBgYP///wAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFAAACACwAAAAABwAHAAACDoxvoJoLvYIIUVgq7dUFADs=");
+            width: 10px;
+            height: 10px;
+            position: relative;
+            display: inline-block;
+            content: "";
+            background-size: 10px;
+            image-rendering: pixelated;
+            animation: blink 1s steps(2, start) infinite;
+        }
+
+        .main {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .footer {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 320px;
+            display: flex;
+            image-rendering: pixelated;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skywater-bgtile {
+            background-image: url("https://james.nekoweb.org/skywater_bgtile.gif");
+            width: 100%;
+            height: 320px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            background-repeat: repeat-x;
+            background-size: auto 320px;
+        }
+
+        .grass-fgtile {
+            background-image: url("https://james.nekoweb.org/grass_fgtile.gif");
+            width: 100%;
+            height: 128px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+            background-repeat: repeat-x;
+            background-size: auto 128px;
+        }
+
+        .water-fganim {
+            background-image: url("https://james.nekoweb.org/water_fganim.gif");
+            width: 360px;
+            height: 48px;
+            position: absolute;
+            bottom: 142px;
+            z-index: 2;
+            /* background-repeat: repeat-x; */
+            background-size: 360px 48px;
+            /* animation: water 1s infinite; */
+        }
+
+        .clouds-fganim {
+            background-image: url("https://james.nekoweb.org/clouds_fganim.gif");
+            width: 100%;
+            height: 100px;
+            position: absolute;
+            top: 0;
+            z-index: 2;
+            background-repeat: repeat-x;
+            background-size: auto 100px;
+            background-position: center center;
+            animation: clouds 920.02s steps(492, end) infinite;
+            animation-delay: 0s;
+        }
+
+        .main-content {
+            min-width: 600px;
+        }
+
+        .main-content .menuborderinner {
+            padding: 10px;
+        }
+
+        a {
+            text-decoration: underline;
+        }
+
+        .blogpost-date {
+            color: #4260d7;
+            float: right;
+            margin-right: -15px;
+        }
+
 
         @font-face {
             font-family: "Pokemon Emerald Pro";
-            src: url(/pokemon-emerald-pro.ttf) format("truetype");
+            src: url("https://jamesschoch.github.io/Pokeneko/pokemon-emerald-pro.ttf") format("truetype");
         }
 
         #sprite {
@@ -73,7 +252,7 @@
             margin: 20px 0;
         }
 
-        .inputwrapper {
+        .inputwrapper>.col {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -84,9 +263,30 @@
         .inputcontrols {
             /* max-width: 280px; */
         }
+
+        button,
+        input {
+            font-family: "Pokemon Emerald Pro";
+            font-size: 22px;
+            text-shadow: 1px 1px 0px rgba(208, 208, 200, 1);
+            color: #606060;
+            padding: 1px 16px;
+        }
+
+        #errorBox {
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        .inputwrapper {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            gap: 30px;
+        }
     </style>
 
-    <link rel="stylesheet" type="text/css" href="https://james.nekoweb.org/stylesheet.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="https://james.nekoweb.org/stylesheet.css" /> -->
 
 </head>
 
@@ -94,28 +294,42 @@
     <div class="main-content menuborder">
         <div class="menuborderinner">
             <div class="inputcontrols">
-
+                <div class="github-button"><a href="https://github.com/jamesschoch/Pokeneko" aria-label="Pokeneko"
+                        class="footer-octicon" title="GitHub">
+                        <svg aria-hidden="true" class="octicon octicon-mark-github" height="24" version="1.1"
+                            viewBox="0 0 16 16" width="24" style="float:right">
+                            <path fill="#606060" fill-rule="evenodd"
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z">
+                            </path>
+                        </svg>
+                    </a></div>
                 <h1>Pokéneko</h1>
                 <p>This was inspired by <a href="https://en.wikipedia.org/wiki/Neko_(software)" target="_blank"
                         rel="noopener noreferrer">Neko</a>, and uses sprites from the <a
                         href="https://sprites.pmdcollab.org/#/About">PMD Sprite Repository from PMDCollab</a>.</p>
                 <div class="inputwrapper">
-                    <label for="pokemon">Pokémon Name</label>
-                    <input list="pokemonlist" name="pokemon" id="pokemon">
-                    <datalist id="pokemonlist"></datalist>
-                    <br>
-                    <label for="pokemonscale">Scale</label>
+                    <div class="col">
+                        <label for="pokemon">Pokémon Name</label>
+                        <input list="pokemonlist" name="pokemon" id="pokemon">
+                        <datalist id="pokemonlist"></datalist>
+                        <br>
+                        <label for="pokemonscale">Scale</label>
 
-                    <input type="number" name="pokemonscale" id="pokemonscale" min="1" value="2">
+                        <input type="number" name="pokemonscale" id="pokemonscale" min="1" value="2">
 
-                    <label for="pokemonshiny">Shiny?</label>
-                    <input type="checkbox" name="pokemonshiny" id="pokemonshiny">
+                        <label for="pokemonshiny">Shiny?</label>
+                        <input type="checkbox" name="pokemonshiny" id="pokemonshiny">
 
-                    <button type="submit" id="submit">Submit</button>
+                        <button type="submit" id="submit">Submit</button>
+                    </div>
+                    <div class="col">
+
+
+                        <textarea name="exportScriptBox" id="exportScriptBox" cols="30" rows="10"></textarea><br>
+                        <button id="copyExportScript">Copy Script</button>
+                    </div>
                 </div>
                 <div id="errorBox"></div>
-                <textarea name="exportScriptBox" id="exportScriptBox" cols="30" rows="10"></textarea><br>
-                <button id="copyExportScript">Copy Script</button>
             </div>
         </div>
     </div>

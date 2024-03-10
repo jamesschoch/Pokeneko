@@ -422,7 +422,7 @@
 
         function populateDatalist() {
             $.ajax({
-                url: "/tracker.json",
+                url: "https://github.com/jamesschoch/Pokeneko/tracker.json",
                 type: "GET",
                 success: function (response) {
                     trackerjson = response;
@@ -439,7 +439,7 @@
 
         function retrieveData() {
             $.ajax({
-                url: "/sprite/" + pokemon.pokedex + "/",
+                url: "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/",
                 type: "GET",
                 success: function (dirlisting) {
                     var folders = [];
@@ -455,9 +455,9 @@
                     pokemon.files = files;
 
                     if (pokemon.shiny) {
-                        var url = "/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
+                        var url = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
                     } else {
-                        var url = "/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
+                        var url = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
                     }
                     $.ajax({
                         url: url,
@@ -472,9 +472,9 @@
                             });
                             Object.keys(pokemon.animData).forEach(function (key) {
                                 if (pokemon.shiny) {
-                                    pokemon.animData[key].animURL = "/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
+                                    pokemon.animData[key].animURL = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
                                 } else {
-                                    pokemon.animData[key].animURL = "/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
+                                    pokemon.animData[key].animURL = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
                                 }
                             });
 

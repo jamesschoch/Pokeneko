@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokéneko</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/xml2json.js"></script>
+    
+    <link rel="preload" href="https://james.nekoweb.org/clouds_fganim.gif" as="image">
+    <link rel="preload" href="https://james.nekoweb.org/grass_fgtile.gif" as="image">
+    <link rel="preload" href="https://james.nekoweb.org/skywater_bgtile.gif" as="image">
+    <link rel="preload" href="https://james.nekoweb.org/water_fganim.gif" as="image">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://james.nekoweb.org/stylesheet.css" />
+
+    <script src="https://james.nekoweb.org/index.js"></script>
+
+    
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0
+        }
+
+        body {
+            background-color: #e0e0e0;
+            font-family: sans-serif;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sprite {
+            image-rendering: pixelated;
+            width: 64px;
+            height: 64px;
+            position: fixed;
+            top: 50%;
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        #spritelayers {
+            position: relative;
+        }
+
+        #spriteanim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 64px;
+            height: 64px;
+        }
+
+        #spriteshadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 64px;
+            height: 64px;
+        }
+
+        #errorBox {
+            margin: 20px 0;
+        }
+
+        .inputwrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 6px;
+        }
+
+        .inputcontrols {
+            max-width: 280px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="inputcontrols">
+
+        <h1>Pokéneko</h1>
+        <p>This was inspired by <a href="https://en.wikipedia.org/wiki/Neko_(software)" target="_blank"
+                rel="noopener noreferrer">Neko</a>, and uses sprites from the <a
+                href="https://sprites.pmdcollab.org/#/About">PMD Sprite Repository from PMDCollab</a>.</p>
+        <div class="inputwrapper">
+            <label for="pokemon">Pokémon Name</label>
+            <input list="pokemonlist" name="pokemon" id="pokemon">
+            <datalist id="pokemonlist"></datalist>
+            <br>
+            <label for="pokemonscale">Scale</label>
+
+            <input type="number" name="pokemonscale" id="pokemonscale" min="1" value="2">
+
+            <label for="pokemonshiny">Shiny?</label>
+            <input type="checkbox" name="pokemonshiny" id="pokemonshiny">
+
+            <button type="submit" id="submit">Submit</button>
+        </div>
+        <div id="errorBox"></div>
+        <textarea name="exportScriptBox" id="exportScriptBox" cols="30" rows="10"></textarea><br>
+        <button id="copyExportScript">Copy Script</button>
+    </div>
+
+
+    <div id="sprite">
+        <div id="spritelayers">
+            <div id="spriteanim"></div>
+            <div id="spriteshadow"></div>
+        </div>
+    </div>
+
+    <script>
+        var trackerjson;
+        var pokemon = {};
+        pokemon.state = "none";
+        var walkAnimInterval, idleAnimInterval;
+        var dirlisting;
+        var distancePx = 0;
+        var CurrentMouseXPostion;
+        var CurrentMouseYPostion;
+        var scale = 2;
+        var rotation = 0;
+        var state;
+        var laststate;
+        var frameCounter;
+        var animPlaying = false;
+        var mouseIdleTime = 0;
+        var anglevar;
+
+        $("body").mousemove(function (e) {
+            mouseIdleTime = 0;
+        });
+
+        function timerIncrement() {
+            mouseIdleTime = mouseIdleTime + 1;
+        }
+
+        function updateDistanceRotation() {
+            var spriteX = $("#sprite").offset().left + 32;
+            var spriteY = $("#sprite").offset().top + 32;
+            distancePx = distance(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+            anglevar = angle360(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+            if (anglevar > 67.5 && anglevar < 112.5) {
+                rotation = 0;
+            } else if (anglevar > 22.5 && anglevar < 67.5) {
+                rotation = 1;
+            } else if (anglevar > 337.5 || anglevar < 22.5) {
+                rotation = 2;
+            } else if (anglevar > 292.5 && anglevar < 337.5) {
+                rotation = 3;
+            } else if (anglevar > 247.5 && anglevar < 292.5) {
+                rotation = 4;
+            } else if (anglevar > 202.5 && anglevar < 247.5) {
+                rotation = 5;
+            } else if (anglevar > 157.5 && anglevar < 202.5) {
+                rotation = 6;
+            } else if (anglevar > 112.5 && anglevar < 157.5) {
+                rotation = 7;
+            }
+        }
+
+        $(document).mousemove(function (event) {
+            CurrentMouseXPostion = event.pageX;
+            CurrentMouseYPostion = event.pageY;
+            updateDistanceRotation();
+
+
+        });
+
+        function angle(cx, cy, ex, ey) {
+            var dy = ey - cy;
+            var dx = ex - cx;
+            var theta = Math.atan2(dy, dx);
+            theta *= 180 / Math.PI;
+            return theta;
+        }
+
+        function distance(cx, cy, ex, ey) {
+            var dx = cx - ex;
+            var dy = cy - ey;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function angle360(cx, cy, ex, ey) {
+            var theta = angle(cx, cy, ex, ey);
+            if (theta < 0) theta = 360 + theta;
+            return theta;
+        }
+
+        function populateDatalist() {
+            $.ajax({
+                url: "/tracker.json",
+                type: "GET",
+                success: function (response) {
+                    trackerjson = response;
+
+                    Object.keys(trackerjson).forEach(function (key) {
+                        $('#pokemonlist').append('<option value="' + ('0000' + key).slice(-4) + " " + trackerjson[key].name + '">' + trackerjson[key].name + '</option>');
+
+                    });
+                }
+            });
+        }
+
+
+
+        function retrieveData() {
+            $.ajax({
+                url: "/sprite/" + pokemon.pokedex + "/",
+                type: "GET",
+                success: function (dirlisting) {
+                    var folders = [];
+                    var files = [];
+                    for (var i = 1; i < $(dirlisting).find('li span.name').length; i++) {
+                        if ($(dirlisting).find('li span.name')[i].innerText.indexOf("0") == 0) {
+                            folders.push($(dirlisting).find('li span.name')[i].innerText);
+                        } else {
+                            files.push($(dirlisting).find('li span.name')[i].innerText);
+                        }
+                    }
+                    pokemon.folders = folders;
+                    pokemon.files = files;
+
+                    if (pokemon.shiny) {
+                        var url = "/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
+                    } else {
+                        var url = "/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
+                    }
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (xml) {
+
+                            console.log($.xml2json(xml));
+                            animData = $.xml2json(xml)["#document"].AnimData.Anims.Anim;
+                            pokemon.animData = {};
+                            animData.forEach(function (anim) {
+                                pokemon.animData[anim.Name] = anim;
+                            });
+                            Object.keys(pokemon.animData).forEach(function (key) {
+                                if (pokemon.shiny) {
+                                    pokemon.animData[key].animURL = "/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
+                                } else {
+                                    pokemon.animData[key].animURL = "/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
+                                }
+                            });
+
+
+                            setSprite("Idle", 0);
+                            runExport();
+                        }
+                    })
+                },
+                error: function (error) {
+                    if (pokemon.animData == undefined) {
+                        $("#errorBox").html("\nAnimation not found. This Pokemon may not have sprites.\nPlease check if the Pokémon has sprites at <a href='https://sprites.pmdcollab.org/#/" + pokemon.pokedex + "'>PMDCollab.</a>\n");
+                    }
+                }
+
+            })
+        }
+
+        function setSprite(animName, frame) {
+            var animData = pokemon.animData[animName];
+            var sprite = $("#sprite");
+            if (animName !== "Sleep") {
+                var rotations = 8;
+            } else {
+                var rotations = 1;
+            }
+            sprite.css("background-image", "url(" + animData.animURL + ")");
+            sprite.css("background-size", (animData.FrameWidth * scale * animData.Durations.Duration.length) + "px " + (animData.FrameHeight * scale * rotations) + "px")
+            sprite.css("width", animData.FrameWidth * scale + "px")
+            sprite.css("height", animData.FrameHeight * scale + "px")
+
+            sprite.css("background-position", (0 - ((animData.FrameWidth * (frame % animData.Durations.Duration.length)) * scale)) + "px " + (0 - ((rotation * animData.FrameHeight) * scale)) + "px");
+        }
+
+        var runningAnim;
+        var runningAnimName;
+        function runAnim(animName) {
+
+            if (pokemon.pokedex) {
+                if (runningAnimName === animName) {
+                    return;
+                } else {
+                    clearInterval(runningAnim);
+                    let frames = [];
+                    for (let i = 0; i < pokemon.animData[animName].Durations.Duration.length; i++) {
+                        for (let j = 0; j < pokemon.animData[animName].Durations.Duration[i]; j++) {
+                            frames.push(i);
+                        }
+                    }
+
+                    let i = 0;
+                    runningAnim = setInterval(function () {
+                        runningAnimName = animName;
+                        setSprite(animName, frames[i]);
+                        i++;
+                        if (i == frames.length) {
+                            setSprite(animName, frames[i]);
+                            i = 0;
+                        }
+                    }, 20);
+                }
+            }
+        }
+
+
+        var moveSprite = setInterval(function () {
+
+            if (pokemon.pokedex) {
+                if (distancePx >= 55) {
+                    state = "Walk";
+                    runAnim("Walk");
+                } else {
+                    state = "Idle";
+                    runAnim("Idle");
+                }
+                if (state == "Walk") {
+                    var sprite = $("#sprite");
+                    var spriteX = sprite.offset().left;
+                    var spriteY = sprite.offset().top;
+                    var angle = angle360(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+                    var dx = Math.cos(angle * Math.PI / 180) * 4;
+                    var dy = Math.sin(angle * Math.PI / 180) * 4;
+                    sprite.css("left", spriteX + dx + "px");
+                    sprite.css("top", spriteY + dy + "px");
+
+
+                }
+                updateDistanceRotation();
+
+                laststate = state;
+            }
+        }, 33);
+
+        $(document).ready(function () {
+            $("#exportScriptBox").val("");
+            $("#copyExportScript").click(function () {
+                $("#exportScriptBox").select();
+                document.execCommand('copy');
+            });
+            populateDatalist()
+
+            $("#submit").click(function () {
+                try {
+                    pokemon.pokedex = $("#pokemon").val().split(" ")[0];
+                    pokemon.shiny = $("#pokemonshiny").is(":checked");
+                    var inputpath = "/sprite/" + pokemon.pokedex + "/";
+                    retrieveData()
+                } catch (error) {
+                    $("#exportScriptBox").val("Error: " + error.message);
+                }
+            });
+
+            var mouseInterval = setInterval(function () {
+                if (mouseIdleTime > 5) {
+                    state = "Sleep"
+                } else if (mouseIdleTime > 1) {
+                    state = "Idle"
+                } else {
+                    state = "Walk"
+                }
+            }, 1000);
+
+        });
+
+        var exportScript;
+
+        function runExport() {
+            Object.keys(pokemon.animData).forEach(function (key) {
+                if (!(pokemon.animData[key].Name == "Walk" || pokemon.animData[key].Name == "Idle")) {
+                    delete pokemon.animData[key];
+                }
+            });
+            delete pokemon.state;
+            delete pokemon.folders;
+            delete pokemon.files;
+            scale = $("#pokemonscale").val();
+            exportScript = `/* Pokéneko v0.3 by james.nekoweb.org
+https://github.com/jamesschoch/Pokeneko/
+
+Pokéneko is built using sprites from PDMCollab's Sprite Repository.
+https://sprites.pmdcollab.org
+
+This snippet uses sprites from https://sprites.pmdcollab.org/#/` + pokemon.pokedex + `
+*/
+var pokemon = ` + JSON.stringify(pokemon) + `;
+let trackerjson;
+
+pokemon.state = "none";
+let walkAnimInterval, idleAnimInterval;
+let dirlisting;
+let distancePx = 0;
+let CurrentMouseXPostion;
+let CurrentMouseYPostion;
+let scale = ` + scale + `;
+let rotation = 0;
+let state;
+let laststate;
+let frameCounter;
+let animPlaying = false;
+let mouseIdleTime = 0;
+let anglevar;
+
+let sprite = document.createElement("div");
+sprite.id = "sprite";
+sprite.style.position = "fixed";
+sprite.style.zIndex = "1000000";
+sprite.style.width = "64px";
+sprite.style.height = "64px";
+sprite.style.pointerEvents = "none";
+sprite.style.top = "50%";
+sprite.style.left = "50%";
+
+document.body.appendChild(sprite);
+
+function getOffset(element)
+{
+    if (!element.getClientRects().length)
+    {
+      return { top: 0, left: 0 };
+    }
+
+    let rect = element.getBoundingClientRect();
+    let win = element.ownerDocument.defaultView;
+    return (
+    {
+      top: rect.top + win.pageYOffset,
+      left: rect.left + win.pageXOffset
+    });   
+}
+
+function timerIncrement() {
+    mouseIdleTime = mouseIdleTime + 1;
+}
+
+function updateDistanceRotation() {
+    let spriteX = getOffset(document.getElementById("sprite")).left + 32;
+    let spriteY = getOffset(document.getElementById("sprite")).top + 32;
+    distancePx = distance(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+    anglevar = angle360(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+    if (anglevar > 67.5 && anglevar < 112.5) {
+        rotation = 0;
+    } else if (anglevar > 22.5 && anglevar < 67.5) {
+        rotation = 1;
+    } else if (anglevar > 337.5 || anglevar < 22.5) {
+        rotation = 2;
+    } else if (anglevar > 292.5 && anglevar < 337.5) {
+        rotation = 3;
+    } else if (anglevar > 247.5 && anglevar < 292.5) {
+        rotation = 4;
+    } else if (anglevar > 202.5 && anglevar < 247.5) {
+        rotation = 5;
+    } else if (anglevar > 157.5 && anglevar < 202.5) {
+        rotation = 6;
+    } else if (anglevar > 112.5 && anglevar < 157.5) {
+        rotation = 7;
+    }
+}
+
+function addEvent(elm, evType, fn, useCapture) {
+    if (elm.addEventListener) {
+        elm.addEventListener(evType, fn, useCapture);
+        return true;
+    }
+    else if (elm.attachEvent) {
+        var r = elm.attachEvent('on' + evType, fn);
+        return r;
+    }
+    else {
+        elm['on' + evType] = fn;
+    }
+}
+
+document.onmousemove = function(event){
+    CurrentMouseXPostion = event.pageX;
+    CurrentMouseYPostion = event.pageY;
+    updateDistanceRotation();
+    mouseIdleTime = 0;
+}
+
+function angle(cx, cy, ex, ey) {
+    let dy = ey - cy;
+    let dx = ex - cx;
+    let theta = Math.atan2(dy, dx); 
+    theta *= 180 / Math.PI; 
+
+    return theta;
+}
+
+function distance(cx, cy, ex, ey) {
+    let dx = cx - ex;
+    let dy = cy - ey;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function angle360(cx, cy, ex, ey) {
+    let theta = angle(cx, cy, ex, ey); 
+    if (theta < 0) theta = 360 + theta; 
+    return theta;
+}
+
+function setSprite(animName, frame) {
+    let animData = pokemon.animData[animName];
+    let sprite = document.getElementById("sprite");
+    if (animName !== "Sleep") {
+        rotations = 8;
+    } else {
+        rotations = 1;
+    }
+    sprite.style.backgroundImage = "url(https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master" + animData.animURL + ")";
+    sprite.style.backgroundSize = (animData.FrameWidth * scale * animData.Durations.Duration.length) + "px " + (animData.FrameHeight * scale * rotations) + "px";
+    sprite.style.width = animData.FrameWidth * scale + "px";
+    sprite.style.height = animData.FrameHeight * scale + "px";
+    sprite.style.backgroundPosition = (0 - ((animData.FrameWidth * (frame % animData.Durations.Duration.length)) * scale)) + "px " + (0 - ((rotation * animData.FrameHeight) * scale)) + "px";
+    sprite.style.imageRendering = "pixelated";
+
+}
+
+let runningAnim;
+let runningAnimName;
+
+function runAnim(animName) {
+
+    if (pokemon.pokedex) {
+        if (runningAnimName === animName) {
+            return;
+        } else {
+            clearInterval(runningAnim);
+            let frames = [];
+            for (let i = 0; i < pokemon.animData[animName].Durations.Duration.length; i++) {
+                for (let j = 0; j < pokemon.animData[animName].Durations.Duration[i]; j++) {
+                    frames.push(i);
+                }
+            }
+
+            let i = 0;
+            runningAnim = setInterval(function () {
+                runningAnimName = animName;
+                setSprite(animName, frames[i]);
+                i++;
+                if (i == frames.length) {
+                    setSprite(animName, frames[i]);
+                    i = 0;
+                }
+            }, 33);
+        }
+    }
+}
+
+let moveSprite = setInterval(function () {
+
+    if (pokemon.pokedex) {
+        if (distancePx >= 55) {
+            state = "Walk";
+            runAnim("Walk");
+
+        } else {
+            state = "Idle";
+            runAnim("Idle");
+        }
+        if (state == "Walk") {
+
+            let sprite = document.getElementById("sprite");
+            let spriteX = getOffset(document.getElementById("sprite")).left;
+            let spriteY = getOffset(document.getElementById("sprite")).top;
+
+            let angle = angle360(spriteX, spriteY, CurrentMouseXPostion, CurrentMouseYPostion);
+            let dx = Math.cos(angle * Math.PI / 180) * 4;
+            let dy = Math.sin(angle * Math.PI / 180) * 4;
+            sprite.style.left = spriteX + dx + "px";
+            sprite.style.top = spriteY + dy + "px";
+
+        }
+        updateDistanceRotation();
+
+        laststate = state;
+    }
+}, 33);
+`;
+
+            exportScript = `<script>` + exportScript + "<\/script>";
+            $("#exportScriptBox").val(exportScript);
+        }
+
+
+        console.log(exportScript);
+
+
+    </script>
+</body>
+
+</html>

@@ -7,27 +7,24 @@
     <title>Pokéneko</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/xml2json.js"></script>
-    
+
     <link rel="preload" href="https://james.nekoweb.org/clouds_fganim.gif" as="image">
     <link rel="preload" href="https://james.nekoweb.org/grass_fgtile.gif" as="image">
     <link rel="preload" href="https://james.nekoweb.org/skywater_bgtile.gif" as="image">
     <link rel="preload" href="https://james.nekoweb.org/water_fganim.gif" as="image">
 
-    
-    <link rel="stylesheet" type="text/css" href="https://james.nekoweb.org/stylesheet.css" />
-
     <script src="https://james.nekoweb.org/index.js"></script>
 
-    
+
     <style>
-        html,
+        /* html,
         body {
             padding: 0;
             margin: 0
         }
 
         body {
-            background-color: #e0e0e0;
+            background-color: #e0e0e0; 
             font-family: sans-serif;
             width: 100vw;
             height: 100vh;
@@ -35,6 +32,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+        } */
+
+        @font-face {
+            font-family: "Pokemon Emerald Pro";
+            src: url(/pokemon-emerald-pro.ttf) format("truetype");
         }
 
         #sprite {
@@ -80,37 +82,43 @@
         }
 
         .inputcontrols {
-            max-width: 280px;
+            /* max-width: 280px; */
         }
     </style>
+
+    <link rel="stylesheet" type="text/css" href="https://james.nekoweb.org/stylesheet.css" />
+
 </head>
 
 <body>
-    <div class="inputcontrols">
+    <div class="main-content menuborder">
+        <div class="menuborderinner">
+            <div class="inputcontrols">
 
-        <h1>Pokéneko</h1>
-        <p>This was inspired by <a href="https://en.wikipedia.org/wiki/Neko_(software)" target="_blank"
-                rel="noopener noreferrer">Neko</a>, and uses sprites from the <a
-                href="https://sprites.pmdcollab.org/#/About">PMD Sprite Repository from PMDCollab</a>.</p>
-        <div class="inputwrapper">
-            <label for="pokemon">Pokémon Name</label>
-            <input list="pokemonlist" name="pokemon" id="pokemon">
-            <datalist id="pokemonlist"></datalist>
-            <br>
-            <label for="pokemonscale">Scale</label>
+                <h1>Pokéneko</h1>
+                <p>This was inspired by <a href="https://en.wikipedia.org/wiki/Neko_(software)" target="_blank"
+                        rel="noopener noreferrer">Neko</a>, and uses sprites from the <a
+                        href="https://sprites.pmdcollab.org/#/About">PMD Sprite Repository from PMDCollab</a>.</p>
+                <div class="inputwrapper">
+                    <label for="pokemon">Pokémon Name</label>
+                    <input list="pokemonlist" name="pokemon" id="pokemon">
+                    <datalist id="pokemonlist"></datalist>
+                    <br>
+                    <label for="pokemonscale">Scale</label>
 
-            <input type="number" name="pokemonscale" id="pokemonscale" min="1" value="2">
+                    <input type="number" name="pokemonscale" id="pokemonscale" min="1" value="2">
 
-            <label for="pokemonshiny">Shiny?</label>
-            <input type="checkbox" name="pokemonshiny" id="pokemonshiny">
+                    <label for="pokemonshiny">Shiny?</label>
+                    <input type="checkbox" name="pokemonshiny" id="pokemonshiny">
 
-            <button type="submit" id="submit">Submit</button>
+                    <button type="submit" id="submit">Submit</button>
+                </div>
+                <div id="errorBox"></div>
+                <textarea name="exportScriptBox" id="exportScriptBox" cols="30" rows="10"></textarea><br>
+                <button id="copyExportScript">Copy Script</button>
+            </div>
         </div>
-        <div id="errorBox"></div>
-        <textarea name="exportScriptBox" id="exportScriptBox" cols="30" rows="10"></textarea><br>
-        <button id="copyExportScript">Copy Script</button>
     </div>
-
 
     <div id="sprite">
         <div id="spritelayers">
@@ -600,6 +608,13 @@ let moveSprite = setInterval(function () {
 
 
     </script>
+
+    <div class="footer">
+        <div class="skywater-bgtile"></div>
+        <div class="grass-fgtile"></div>
+        <div class="water-fganim"></div>
+        <div class="clouds-fganim"></div>
+    </div>
 </body>
 
 </html>

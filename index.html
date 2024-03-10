@@ -295,7 +295,7 @@
     <div class="main-content menuborder">
         <div class="menuborderinner">
             <div class="inputcontrols">
-                <div class="github-button"><a href="https://github.com/jamesschoch/Pokeneko" aria-label="Pokeneko"
+                <div class="github-button"><a href="https://jamesschoch.github.io/Pokeneko" aria-label="Pokeneko"
                         class="footer-octicon" title="GitHub">
                         <svg aria-hidden="true" class="octicon octicon-mark-github" height="24" version="1.1"
                             viewBox="0 0 16 16" width="24" style="float:right">
@@ -422,7 +422,7 @@
 
         function populateDatalist() {
             $.ajax({
-                url: "https://github.com/jamesschoch/Pokeneko/tracker.json",
+                url: "https://jamesschoch.github.io/Pokeneko/tracker.json",
                 type: "GET",
                 success: function (response) {
                     trackerjson = response;
@@ -439,7 +439,7 @@
 
         function retrieveData() {
             $.ajax({
-                url: "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/",
+                url: "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/",
                 type: "GET",
                 success: function (dirlisting) {
                     var folders = [];
@@ -455,9 +455,9 @@
                     pokemon.files = files;
 
                     if (pokemon.shiny) {
-                        var url = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
+                        var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
                     } else {
-                        var url = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
+                        var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
                     }
                     $.ajax({
                         url: url,
@@ -472,9 +472,9 @@
                             });
                             Object.keys(pokemon.animData).forEach(function (key) {
                                 if (pokemon.shiny) {
-                                    pokemon.animData[key].animURL = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
+                                    pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
                                 } else {
-                                    pokemon.animData[key].animURL = "https://github.com/jamesschoch/Pokeneko/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
+                                    pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
                                 }
                             });
 
@@ -612,7 +612,7 @@
             delete pokemon.files;
             scale = $("#pokemonscale").val();
             exportScript = `/* Pokéneko v0.3 by https://james.nekoweb.org/
-https://github.com/jamesschoch/Pokeneko/
+https://jamesschoch.github.io/Pokeneko/
 
 Pokéneko is built using sprites from PDMCollab's Sprite Repository.
 https://sprites.pmdcollab.org

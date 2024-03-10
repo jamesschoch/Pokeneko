@@ -438,51 +438,51 @@
 
 
         function retrieveData() {
+            // $.ajax({
+            //     url: "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/",
+            //     type: "GET",
+            //     success: function (dirlisting) {
+            //         var folders = [];
+            //         var files = [];
+            //         for (var i = 1; i < $(dirlisting).find('li span.name').length; i++) {
+            //             if ($(dirlisting).find('li span.name')[i].innerText.indexOf("0") == 0) {
+            //                 folders.push($(dirlisting).find('li span.name')[i].innerText);
+            //             } else {
+            //                 files.push($(dirlisting).find('li span.name')[i].innerText);
+            //             }
+            //         }
+            //         pokemon.folders = folders;
+            //         pokemon.files = files;
+
+            if (pokemon.shiny) {
+                var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
+            } else {
+                var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
+            }
             $.ajax({
-                url: "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/",
+                url: url,
                 type: "GET",
-                success: function (dirlisting) {
-                    var folders = [];
-                    var files = [];
-                    for (var i = 1; i < $(dirlisting).find('li span.name').length; i++) {
-                        if ($(dirlisting).find('li span.name')[i].innerText.indexOf("0") == 0) {
-                            folders.push($(dirlisting).find('li span.name')[i].innerText);
+                success: function (xml) {
+
+                    console.log($.xml2json(xml));
+                    animData = $.xml2json(xml)["#document"].AnimData.Anims.Anim;
+                    pokemon.animData = {};
+                    animData.forEach(function (anim) {
+                        pokemon.animData[anim.Name] = anim;
+                    });
+                    Object.keys(pokemon.animData).forEach(function (key) {
+                        if (pokemon.shiny) {
+                            pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
                         } else {
-                            files.push($(dirlisting).find('li span.name')[i].innerText);
+                            pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
                         }
-                    }
-                    pokemon.folders = folders;
-                    pokemon.files = files;
-
-                    if (pokemon.shiny) {
-                        var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/AnimData.xml";
-                    } else {
-                        var url = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + "/AnimData.xml";
-                    }
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        success: function (xml) {
-
-                            console.log($.xml2json(xml));
-                            animData = $.xml2json(xml)["#document"].AnimData.Anims.Anim;
-                            pokemon.animData = {};
-                            animData.forEach(function (anim) {
-                                pokemon.animData[anim.Name] = anim;
-                            });
-                            Object.keys(pokemon.animData).forEach(function (key) {
-                                if (pokemon.shiny) {
-                                    pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/0000/0001/" + key + "-Anim.png";
-                                } else {
-                                    pokemon.animData[key].animURL = "https://jamesschoch.github.io/Pokeneko/sprite/" + pokemon.pokedex + "/" + key + "-Anim.png";
-                                }
-                            });
+                    });
 
 
-                            setSprite("Idle", 0);
-                            runExport();
-                        }
-                    })
+                    setSprite("Idle", 0);
+                    runExport();
+                    //     }
+                    // })
                 },
                 error: function (error) {
                     if (pokemon.animData == undefined) {
